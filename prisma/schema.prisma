@@ -1,0 +1,31 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Leads tracking structure (New, Contacted, Proposal, Won, Lost)
+model Lead {
+  id          String   @id @default(uuid())
+  name        String
+  company     String
+  email       String   @unique
+  phone       String?
+  status      String   @default("NEW") // NEW, CONTACTED, PROPOSAL, WON, LOST
+  value       Int      @default(0)     // Estimated deal value
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  activities  ActivityLog[]
+}
+
+// Activity logging system for leads tracking
+model ActivityLog {
+  id          String   @id @default(uuid())
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type        String   // CALL, EMAIL, MEETING, NOTE
+  description String
+  recordedAt  DateTime @default(now())
+}
